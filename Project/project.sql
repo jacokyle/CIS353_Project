@@ -1,141 +1,142 @@
-SPOOL project.out
-SET ECHO ON
+   SPOOL project.out
+   SET ECHO ON
 
--- This command file creates and populates the PROJECT database for our final project. 
--- This command file was written by Kyle Jacobson, Farid Karadsheh, Daniel Shamburger, Chesten VanPelt.
+   -- This command file creates and populates the PROJECT database for our final project. 
+   -- This command file was written by Kyle Jacobson, Farid Karadsheh, Daniel Shamburger, Chesten VanPelt.
 
--- Drop the tables (in case they already exist in the system).
+   -- Drop the tables (in case they already exist in the system).
 
-DROP TABLE Warehouse CASCADE CONSTRAINTS;
-DROP TABLE Purchasing_Coordinator CASCADE CONSTRAINTS;
-DROP TABLE Store CASCADE CONSTRAINTS;
-DROP TABLE Orders CASCADE CONSTRAINTS;
-DROP TABLE Product CASCADE CONSTRAINTS;
-DROP TABLE Supplier CASCADE CONSTRAINTS;
-DROP TABLE Inventory CASCADE CONSTRAINTS;
-DROP TABLE Sells CASCADE CONSTRAINTS;
-DROP TABLE Represents CASCADE CONSTRAINTS;
-DROP TABLE Notes CASCADE CONSTRAINTS;
-DROP TABLE Sales_History CASCADE CONSTRAINTS;
-DROP TABLE Portion CASCADE CONSTRAINTS;
-DROP TABLE Manager CASCADE CONSTRAINTS;
+   DROP TABLE Warehouse CASCADE CONSTRAINTS;
+   DROP TABLE Purchasing_Coordinator CASCADE CONSTRAINTS;
+   DROP TABLE Store CASCADE CONSTRAINTS;
+   DROP TABLE Orders CASCADE CONSTRAINTS;
+   DROP TABLE Product CASCADE CONSTRAINTS;
+   DROP TABLE Supplier CASCADE CONSTRAINTS;
+   DROP TABLE Inventory CASCADE CONSTRAINTS;
+   DROP TABLE Sells CASCADE CONSTRAINTS;
+   DROP TABLE Represents CASCADE CONSTRAINTS;
+   DROP TABLE Notes CASCADE CONSTRAINTS;
+   DROP TABLE Sales_History CASCADE CONSTRAINTS;
+   DROP TABLE Portion CASCADE CONSTRAINTS;
+   DROP TABLE Manager CASCADE CONSTRAINTS;
 
--- Create the tables for the project.
+   -- Create the tables for the project.
 
-    -- Create the warehouse table.
-CREATE TABLE  Warehouse (
-	wareNum   			INTEGER,
-	wareName 				VARCHAR(25) NOT NULL,
-	address 				VARCHAR(50) NOT NULL,
+   -- Create the warehouse table.
+   CREATE TABLE  Warehouse (
+	wareNum   	INTEGER,
+	wareName 	VARCHAR(25) NOT NULL,
+	address 	VARCHAR(50) NOT NULL,
 	CONSTRAINT wIC1 PRIMARY KEY (wareNum)
 	);
 
-    -- Create the purchasing coordinator table.
-    CREATE TABLE Purchasing_Coordinator (
-	    customerID 		INTEGER PRIMARY KEY,
-			purName		 		VARCHAR(25) NOT NULL,
-	    purPhoneNum		VARCHAR(25) NOT NULL
-	    );
+   -- Create the purchasing coordinator table.
+   CREATE TABLE Purchasing_Coordinator (
+	customerID 	INTEGER PRIMARY KEY,
+	purName		VARCHAR(25) NOT NULL,
+	purPhoneNum	VARCHAR(25) NOT NULL
+	);
 
-    -- Create the store table.
-    CREATE TABLE Store (
-	    storeID 					INTEGER PRIMARY KEY,
-	    storeName 				VARCHAR(25) NOT NULL, 
-	    storeLocation 		VARCHAR(60) NOT NULL	
-	    );
+   -- Create the store table.
+   CREATE TABLE Store (
+	storeID 	INTEGER PRIMARY KEY,
+	storeName 	VARCHAR(25) NOT NULL, 
+	storeLocation 	VARCHAR(60) NOT NULL	
+	);
 
-    -- Create the order table.
-CREATE TABLE Orders (
-	orderID 						INTEGER PRIMARY KEY,
-	wareNum							INTEGER NOT NULL,
-	customerID					INTEGER NOT NULL, 
-	storeID							INTEGER NOT NULL,
-	o_date 							DATE NOT NULL, 
+   -- Create the order table.
+   CREATE TABLE Orders (
+	orderID 	INTEGER PRIMARY KEY,
+	wareNum		INTEGER NOT NULL,
+	customerID	INTEGER NOT NULL, 
+	storeID		INTEGER NOT NULL,
+	o_date 		DATE NOT NULL, 
 	CONSTRAINT ordIC1 FOREIGN KEY (wareNum) REFERENCES Warehouse (wareNum),
 	CONSTRAINT ordIC2 FOREIGN KEY (customerID) REFERENCES Purchasing_Coordinator (customerID),
 	CONSTRAINT ordIC3 FOREIGN KEY (storeID) REFERENCES Store (storeID)
 	);
 
-    -- Create the product table.
-CREATE TABLE Product (
-	productID 					INTEGER PRIMARY KEY,
-	proName 						VARCHAR(50) NOT NULL, 
-	description 				VARCHAR(200) NOT NULL, 
-	weight 							DECIMAL NOT NULL,
+   -- Create the product table.
+   CREATE TABLE Product (
+	productID 	INTEGER PRIMARY KEY,
+	proName 	VARCHAR(50) NOT NULL, 
+	description 	VARCHAR(200) NOT NULL, 
+	weight 		DECIMAL NOT NULL,
 	CONSTRAINT proIC1 CHECK (weight > 0)
 	);
 
-    -- Create the supplier table.
-    CREATE TABLE Supplier (
-	    supplierID 			INTEGER PRIMARY KEY,
-	    supName 				VARCHAR(25) NOT NULL,
-	    supLocation 		VARCHAR(50) NOT NULL
-	    );
+   -- Create the supplier table.
+   CREATE TABLE Supplier (
+	supplierID 	INTEGER PRIMARY KEY,
+	supName 	VARCHAR(25) NOT NULL,
+	supLocation 	VARCHAR(50) NOT NULL
+	);
 
     -- Create the sells table.
     CREATE TABLE Sells (
-	    supplierID			INTEGER NOT NULL,
-	    productID				INTEGER NOT NULL, 
-	    primary key		(supplierID, productID),
-	    CONSTRAINT seIC1 FOREIGN KEY (supplierID) REFERENCES Supplier (supplierID) ON DELETE CASCADE,
-	    CONSTRAINT seIC2 FOREIGN KEY (productID) REFERENCES Product (productID) ON DELETE CASCADE
-	    );
+	supplierID	INTEGER NOT NULL,
+	productID	INTEGER NOT NULL, 
+	primary key	(supplierID, productID),
+	CONSTRAINT seIC1 FOREIGN KEY (supplierID) REFERENCES Supplier (supplierID) ON DELETE CASCADE,
+	CONSTRAINT seIC2 FOREIGN KEY (productID) REFERENCES Product (productID) ON DELETE CASCADE
+	);
+	
     -- Create the represents table.
     CREATE TABLE Represents (
-	    customerID			INTEGER NOT NULL, 
-	    storeID					INTEGER NOT NULL, 
-	    primary key 		(storeID, customerID),
-	    CONSTRAINT repIC1 FOREIGN KEY (customerID) REFERENCES Purchasing_Coordinator (customerID) ON DELETE CASCADE,
-	    CONSTRAINT repIC2 FOREIGN KEY (storeID) REFERENCES Store (storeID) ON DELETE CASCADE
-	    );
+	customerID	INTEGER NOT NULL, 
+	storeID		INTEGER NOT NULL, 
+	primary key 	(storeID, customerID),
+	CONSTRAINT repIC1 FOREIGN KEY (customerID) REFERENCES Purchasing_Coordinator (customerID) ON DELETE CASCADE,
+	CONSTRAINT repIC2 FOREIGN KEY (storeID) REFERENCES Store (storeID) ON DELETE CASCADE
+	);
 
     -- Create the notes table.
     CREATE TABLE Notes (
-	    orderID			INTEGER,
-	    notes 			VARCHAR(100),
-	    primary key		(orderID, notes),
-	    CONSTRAINT notIC1 FOREIGN KEY (orderID) REFERENCES Orders (orderID) ON DELETE CASCADE 
-	    );
+	orderID		INTEGER,
+	notes 		VARCHAR(100),
+	primary key	(orderID, notes),
+	CONSTRAINT notIC1 FOREIGN KEY (orderID) REFERENCES Orders (orderID) ON DELETE CASCADE 
+	);
 
     -- Create the sales history table.
-CREATE TABLE Sales_History (
-	numSold 			INTEGER NOT NULL,
-	revenue				INTEGER NOT NULL,
-	productID 		INTEGER NOT NULL,
-	saleYear		SMALLINT NOT NULL,
-	primary key		(productID, saleYear),
+    CREATE TABLE Sales_History (
+	numSold 	INTEGER NOT NULL,
+	revenue		INTEGER NOT NULL,
+	productID 	INTEGER NOT NULL,
+	saleYear	SMALLINT NOT NULL,
+	primary key	(productID, saleYear),
 	CONSTRAINT s_hIC1 FOREIGN KEY(productID) REFERENCES Product (productID),
 	CONSTRAINT s_hIC2 CHECK ((numSold > 0) AND (revenue > 0))
 	);
 
     -- Creates a relational table linking products to warehouse.
     CREATE TABLE Inventory (
-	    wareNum				INTEGER NOT NULL,
-	    productID 		INTEGER NOT NULL,
-	    quantity			INTEGER NOT NULL,
-	    primary key		(productID, wareNum),
-	    CONSTRAINT invIC1 FOREIGN KEY(productID) REFERENCES Product (productID) ON DELETE CASCADE,
-	    CONSTRAINT invIC2 FOREIGN KEY(wareNum) REFERENCES Warehouse(wareNum) ON DELETE CASCADE
-	    );
+	wareNum		INTEGER NOT NULL,
+	productID 	INTEGER NOT NULL,
+	quantity	INTEGER NOT NULL,
+	primary key	(productID, wareNum),
+	CONSTRAINT invIC1 FOREIGN KEY(productID) REFERENCES Product (productID) ON DELETE CASCADE,
+	CONSTRAINT invIC2 FOREIGN KEY(wareNum) REFERENCES Warehouse(wareNum) ON DELETE CASCADE
+	);
 
     -- Creates a relational table linking products to order.
     CREATE TABLE Portion (
-	    orderID				INTEGER NOT NULL,
-	    productID 		INTEGER NOT NULL,
-	    pQuantity			INTEGER NOT NULL,
-	    primary key		(productID, orderID),
-	    CONSTRAINT porIC1 FOREIGN KEY(productID) REFERENCES Product (productID),
-	    CONSTRAINT porIC2 FOREIGN KEY(OrderID) REFERENCES Orders (OrderID) ON DELETE CASCADE
-	    );
+	orderID		INTEGER NOT NULL,
+	productID 	INTEGER NOT NULL,
+	pQuantity	INTEGER NOT NULL,
+	primary key	(productID, orderID),
+	CONSTRAINT porIC1 FOREIGN KEY(productID) REFERENCES Product (productID),
+	CONSTRAINT porIC2 FOREIGN KEY(OrderID) REFERENCES Orders (OrderID) ON DELETE CASCADE
+	);
 
     -- Create the manager table.
     CREATE TABLE Manager (
-	    managerID 		INTEGER PRIMARY KEY,
-	    wareNum				INTEGER NOT NULL,
-	    manPhoneNum		VARCHAR(25) NOT NULL,
-	    manName				VARCHAR(30),
-	    CONSTRAINT manIC1 FOREIGN KEY(wareNum) REFERENCES Warehouse(wareNum) ON DELETE CASCADE
-	    );
+	managerID 	INTEGER PRIMARY KEY,
+	wareNum		INTEGER NOT NULL,
+	manPhoneNum	VARCHAR(25) NOT NULL,
+	manName		VARCHAR(30),
+	CONSTRAINT manIC1 FOREIGN KEY(wareNum) REFERENCES Warehouse(wareNum) ON DELETE CASCADE
+	);
 
     SET FEEDBACK OFF
 
@@ -219,7 +220,7 @@ CREATE TABLE Sales_History (
     INSERT INTO Sells VALUES(6, 6);
     INSERT INTO Sells VALUES(6, 1);
 
---Inserts data into portion (orderID, productID , pQuantity)
+    --Inserts data into portion (orderID, productID , pQuantity)
     INSERT INTO Portion VALUES(6, 6, 2);
     INSERT INTO Portion VALUES(3, 4, 3);
     INSERT INTO Portion VALUES(7, 6, 5);
@@ -330,16 +331,16 @@ CREATE TABLE Sales_History (
     -- Query: A join involving at least four relations.
     -- Description: Finds Warehouses, Stores, and Suppliers that are all on the same order, and are located in “Grand Rapids”.
     SELECT 		O.orderID, W.address, S.storeLocation, Sup.supLocation
-    FROM 			Warehouse W, Store S, Supplier Sup, Order O, Product P, Portion Por, Sells Sel
+    FROM 		Warehouse W, Store S, Supplier Sup, Order O, Product P, Portion Por, Sells Sel
     WHERE 		O.storeID = S.StoreID AND 
-    S.storeLocation LIKE ‘%Grand Rapids%’  AND 
-    O.wareNum = W.wareNum AND
-    W.address LIKE ‘%Grand Rapids%’ AND 
-    O.orderID = Por.orderID AND
-    Por.productID = P.productID AND
-    P.productID = Sel.productID AND
-    Sel.supplierID = Sup.supplierID AND
-    Sup.supLocation LIKE ‘%Grand Rapids%’
+    				S.storeLocation LIKE ‘%Grand Rapids%’ AND 
+    				O.wareNum = W.wareNum AND
+    				W.address LIKE ‘%Grand Rapids%’ AND 
+    				O.orderID = Por.orderID AND
+    				Por.productID = P.productID AND
+    				P.productID = Sel.productID AND
+    				Sel.supplierID = Sup.supplierID AND
+    				Sup.supLocation LIKE ‘%Grand Rapids%’
     ORDER BY O.orderID
 
     -- Query: A self-join. 
@@ -347,82 +348,86 @@ CREATE TABLE Sales_History (
     SELECT 		O1.orderID, O1.wareNum, O1.storeID, O2.orderID, O2.wareNum, O2.storeID
     FROM  		Orders O1, Orders O2
     WHERE 		O1.wareNum = O2.wareNum AND
-    O1.storeID = O2.storeID AND
-    O1.orderID > O2.orderID
+    				O1.storeID = O2.storeID AND
+    				O1.orderID > O2.orderID
     ORDER BY 		O1.orderID;
 
     -- Query: UNION, INTERSECT, and/or MINUS.
     -- Description: Finds products that there are more than 4 in any warehouse, and whose weight is greater than 10 
     SELECT 		P.productID, P.weight, I.quantity
-    FROM 			Product P, Inventory I
-    WHERE			I.quantity > 4 AND 
-    I.productID = P.productID
+    FROM 		Product P, Inventory I
+    WHERE		I.quantity > 4 AND 
+    				I.productID = P.productID
+				
     INTERSECT
+    
     SELECT 		P.productID, P.weight, I.quantity
-    FROM 			Product P, Inventory I
-    WHERE			I.productID = P.productID AND 
+    FROM 		Product P, Inventory I
+    WHERE		I.productID = P.productID AND 
     P.weight  > 10;
 
     -- Query: SUM, AVG, MAX and/or MIN.
     -- Description: Finds average weight of products for each warehouse.
-SELECT 		W.wareNum, AVG(P.weight)
-    FROM 					Warehouse W, Product P, Inventory I
-    WHERE 				I.wareNum = W.wareNum AND 
-    I.productID = P.productID 
-    GROUP BY			W.wareNum
-    HAVING				AVG(P.weight) > 0
-    ORDER BY 			W.wareNum;
+    SELECT 		W.wareNum, AVG(P.weight)
+    FROM 		Warehouse W, Product P, Inventory I
+    WHERE 		I.wareNum = W.wareNum AND 
+    				I.productID = P.productID 
+    GROUP BY		W.wareNum
+    HAVING		AVG(P.weight) > 0
+    ORDER BY 		W.wareNum;
 
     -- Query: GROUP BY, HAVING, and ORDER BY, all appearing in the same query.
     -- Description: Finds suppliers that supply more than 2 products.
-SELECT 		DISTINCT S.supplierID, S.supName, COUNT(DISTINCT P.productID)
-    FROM 			Supplier S, Product P, Sells Sel
+    SELECT 		DISTINCT S.supplierID, S.supName, COUNT(DISTINCT P.productID)
+    FROM 		Supplier S, Product P, Sells Sel
     WHERE 		P.productID = Sel.productID AND
-    					Sel.supplierID = S.supplierID
-    GROUP BY 	S.supplierID, S.supName
+    				Sel.supplierID = S.supplierID
+    GROUP BY 		S.supplierID, S.supName
     HAVING 		COUNT(*) > 2
-    ORDER BY 	S.supplierID;
+    ORDER BY 		S.supplierID;
 
     -- Query: A correlated subquery.
     -- Description: Finds the heaviest item and shows what warehouse it’s in.
     SELECT		I1.wareNum, I1.productID, P1.weight
-    FROM 			Product P1, Inventory I1
-    WHERE			I1.productID = P1.productID AND
-    P1.weight = 
-(SELECT 	MAX(P2.weight)
- FROM 		Product P2, Inventory I2	
- WHERE	I1.wareNum = I2.wareNum)
+    FROM 		Product P1, Inventory I1
+    WHERE		I1.productID = P1.productID AND
+    			P1.weight = 
+    			(SELECT		MAX(P2.weight)
+    			FROM 		Product P2, Inventory I2	
+    			WHERE		1.wareNum = I2.wareNum)
     ORDER BY I1.wareNum;
 
     -- Query: A non-correlated subquery.
     -- Description: Finds the name of every product that has less than 15 number of sold units.
     SELECT 		P.productID, P.proName 
-    FROM 			Product P
-    WHERE			P.productID NOT IN 
-    		(SELECT SH.productID
-    		 FROM Sales_History SH
-     		 WHERE SH.numSold > 15 )
+    FROM 		Product P
+    WHERE		P.productID NOT IN 
+    			(SELECT 	SH.productID
+    		 	FROM 		Sales_History SH
+     		 	WHERE 		SH.numSold > 15 )
     ORDER BY P.productID;
 
     -- Query: A relational DIVISION query.
     -- Description: Finds the name and product ID of every product that is supplied by Walmart.
     SELECT 		P.proName, P.productID
-    FROM 			Product P
-    WHERE			NOT EXISTS((SELECT S.supName
-		FROM 			Supplier S
-		WHERE 		S.supName = 'Walmart')
-	    MINUS
-	    (SELECT 	S.supName
-	     FROM		Supplier S, Sells Sel
-	     WHERE	P.productID = Sel.productID AND
-	     Sel.supplierID = S.supplierID AND
-	     S.supName = 'Walmart'))	
+    FROM 		Product P
+    WHERE		NOT EXISTS((SELECT S.supName
+    FROM 			Supplier S
+    WHERE 		S.supName = 'Walmart')
+	    
+    MINUS
+	    
+    (SELECT 		S.supName
+    FROM		Supplier S, Sells Sel
+    WHERE		P.productID = Sel.productID AND
+	     			Sel.supplierID = S.supplierID AND
+	     			S.supName = 'Walmart'))	
     ORDER BY		P.proName;	
 
     -- Query: An outer join query.
     -- Description: Finds the managerID, manName, manPhoneNum for every manager. Also shows the address of the warehouse they manage.
     SELECT 		M.managerID, M.manName, M.manPhoneNum, W.wareNum
-    FROM 			Manager M LEFT OUTER JOIN Warehouse W ON M.wareNum = W.wareNum;
+    FROM 		Manager M LEFT OUTER JOIN Warehouse W ON M.wareNum = W.wareNum;
 
     -- Insert DELETE/UPDATE statements that violate integrity constraints for testing our queries.
 
